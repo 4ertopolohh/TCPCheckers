@@ -1,0 +1,200 @@
+<mxfile host="app.diagrams.net" agent="ChatGPT">
+  <diagram id="system-design-network-checkers-v2" name="Системное проектирование">
+    <mxGraphModel dx="2575" dy="1438" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2320" pageHeight="1420" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="app" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;strokeWidth=1.5;fillColor=#EEF2FF;strokeColor=#4F46E5;fontSize=14;align=center;verticalAlign=middle;spacing=8;shadow=0;fontSize=16;" value="&lt;b&gt;Приложение “Сетевые шашки”&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:12px&quot;&gt;WinForms + игровая логика + локальное TCP/IP-соединение&lt;/span&gt;" vertex="1">
+          <mxGeometry height="75" width="660" x="830" y="105" as="geometry" />
+        </mxCell>
+        <mxCell id="user" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;strokeWidth=1.5;fillColor=#FFF7ED;strokeColor=#EA580C;fontSize=14;align=center;verticalAlign=middle;spacing=8;shadow=0;" value="&lt;b&gt;Пользователь&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:12px&quot;&gt;создаёт игру, подключается,&lt;br&gt;выбирает шашку и ход&lt;/span&gt;" vertex="1">
+          <mxGeometry height="75" width="280" x="90" y="105" as="geometry" />
+        </mxCell>
+        <mxCell id="ui_container" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=2;fillColor=#EAF4FF;strokeColor=#2563EB;fontSize=16;fontStyle=1;align=center;verticalAlign=top;spacingTop=16;shadow=0;" value="&lt;b&gt;Подсистема пользовательского интерфейса&lt;/b&gt;" vertex="1">
+          <mxGeometry height="440" width="560" x="80" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="logic_container" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=2;fillColor=#ECFDF5;strokeColor=#059669;fontSize=16;fontStyle=1;align=center;verticalAlign=top;spacingTop=16;shadow=0;" value="&lt;b&gt;Подсистема игровой логики&lt;/b&gt;" vertex="1">
+          <mxGeometry height="440" width="560" x="880" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="network_container" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=2;fillColor=#FFF7ED;strokeColor=#EA580C;fontSize=16;fontStyle=1;align=center;verticalAlign=top;spacingTop=16;shadow=0;" value="&lt;b&gt;Подсистема сетевого взаимодействия&lt;/b&gt;" vertex="1">
+          <mxGeometry height="440" width="560" x="1680" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="tests_container" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=2;fillColor=#F5F3FF;strokeColor=#7C3AED;fontSize=16;fontStyle=1;align=center;verticalAlign=top;spacingTop=16;shadow=0;" value="&lt;b&gt;Подсистема тестирования&lt;/b&gt;" vertex="1">
+          <mxGeometry height="420" width="560" x="80" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="models_container" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=2;fillColor=#F0FDFA;strokeColor=#0D9488;fontSize=16;fontStyle=1;align=center;verticalAlign=top;spacingTop=16;shadow=0;" value="&lt;b&gt;Подсистема моделей&lt;/b&gt;" vertex="1">
+          <mxGeometry height="420" width="560" x="880" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="delivery_container" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;strokeWidth=2;fillColor=#FDF2F8;strokeColor=#DB2777;fontSize=16;fontStyle=1;align=center;verticalAlign=top;spacingTop=16;shadow=0;" value="&lt;b&gt;Подсистема поставки и сопровождения&lt;/b&gt;" vertex="1">
+          <mxGeometry height="420" width="560" x="1680" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="ui_board" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#2563EB;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Игровое поле 8×8&lt;/b&gt;&lt;br&gt;клетки, шашки двух цветов,&lt;br&gt;выделение выбранной шашки" vertex="1">
+          <mxGeometry height="100" width="220" x="380" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="ui_connection" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#2563EB;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Управление соединением&lt;/b&gt;&lt;br&gt;кнопка создания сервера&lt;br&gt;кнопка подключения&lt;br&gt;поля IP-адреса и порта" vertex="1">
+          <mxGeometry height="110" width="230" x="110" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="ui_status" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#2563EB;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Отображение состояния&lt;/b&gt;&lt;br&gt;индикатор текущего хода&lt;br&gt;область сообщений&lt;br&gt;ошибки и состояние сети" vertex="1">
+          <mxGeometry height="110" width="220" x="380" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="ui_actions" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#2563EB;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Обработка действий игрока&lt;/b&gt;&lt;br&gt;выбор шашки, выбор клетки назначения, отправка запроса на проверку хода" vertex="1">
+          <mxGeometry height="75" width="490" x="110" y="577.5" as="geometry" />
+        </mxCell>
+        <mxCell id="logic_game" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#059669;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;CheckersGame&lt;/b&gt;&lt;br&gt;управление партией&lt;br&gt;очередность ходов&lt;br&gt;проверка победителя" vertex="1">
+          <mxGeometry height="110" width="220" x="910" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="logic_board" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#059669;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;GameBoard&lt;/b&gt;&lt;br&gt;состояние клеток&lt;br&gt;начальная расстановка&lt;br&gt;изменение доски" vertex="1">
+          <mxGeometry height="110" width="220" x="1190" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="logic_validator" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#059669;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;MoveValidator&lt;/b&gt;&lt;br&gt;обычный ход&lt;br&gt;взятие шашки&lt;br&gt;запрет неверного хода" vertex="1">
+          <mxGeometry height="115" width="220" x="910" y="445" as="geometry" />
+        </mxCell>
+        <mxCell id="logic_rules" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#059669;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Правила партии&lt;/b&gt;&lt;br&gt;ход только в свою очередь&lt;br&gt;нельзя ходить чужой шашкой&lt;br&gt;удаление взятой шашки" vertex="1">
+          <mxGeometry height="115" width="220" x="1190" y="445" as="geometry" />
+        </mxCell>
+        <mxCell id="logic_state" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#059669;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Изменение состояния партии&lt;/b&gt;&lt;br&gt;состояние доски изменяется только после корректной проверки хода" vertex="1">
+          <mxGeometry height="70" width="500" x="910" y="582.5" as="geometry" />
+        </mxCell>
+        <mxCell id="net_server" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#EA580C;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;TcpGameServer&lt;/b&gt;&lt;br&gt;запуск сервера&lt;br&gt;ожидание второго игрока" vertex="1">
+          <mxGeometry height="90" width="230" x="1710" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="net_client" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#EA580C;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;TcpGameClient&lt;/b&gt;&lt;br&gt;подключение по IP и порту&lt;br&gt;обмен сообщениями" vertex="1">
+          <mxGeometry height="90" width="230" x="1970" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="net_messages" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#EA580C;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Отправка и приём&lt;/b&gt;&lt;br&gt;передача хода&lt;br&gt;приём хода соперника&lt;br&gt;JSON построчно" vertex="1">
+          <mxGeometry height="110" width="230" x="1710" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="net_connection" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#EA580C;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Обработка соединения&lt;/b&gt;&lt;br&gt;подключение&lt;br&gt;потеря соединения&lt;br&gt;закрытие ресурсов" vertex="1">
+          <mxGeometry height="110" width="230" x="1970" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="net_types" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#EA580C;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Типы JSON-сообщений&lt;/b&gt;&lt;br&gt;connect, move, gameOver, error, disconnect" vertex="1">
+          <mxGeometry height="75" width="490" x="1710" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="test_unit" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#7C3AED;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Модульные тесты GameLogic&lt;/b&gt;&lt;br&gt;начальная расстановка&lt;br&gt;корректный ход&lt;br&gt;некорректный ход&lt;br&gt;взятие&lt;br&gt;очередность&lt;br&gt;победитель" vertex="1">
+          <mxGeometry height="150" width="230" x="110" y="980" as="geometry" />
+        </mxCell>
+        <mxCell id="test_integration" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#7C3AED;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Интеграционные тесты&lt;/b&gt;&lt;br&gt;передача хода по сети&lt;br&gt;обновление поля&lt;br&gt;отключение клиента&lt;br&gt;отключение сервера" vertex="1">
+          <mxGeometry height="130" width="220" x="380" y="990" as="geometry" />
+        </mxCell>
+        <mxCell id="test_acceptance" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#7C3AED;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Системная и приёмочная проверка&lt;/b&gt;&lt;br&gt;запуск двух экземпляров, создание сервера, подключение клиента, проведение партии" vertex="1">
+          <mxGeometry height="90" width="490" x="110" y="1160" as="geometry" />
+        </mxCell>
+        <mxCell id="model_move_piece" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#0D9488;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Move, Piece&lt;/b&gt;&lt;br&gt;координаты хода&lt;br&gt;цвет и тип шашки" vertex="1">
+          <mxGeometry height="85" width="230" x="910" y="980" as="geometry" />
+        </mxCell>
+        <mxCell id="model_state" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#0D9488;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;PlayerColor, GameState&lt;/b&gt;&lt;br&gt;цвет игрока&lt;br&gt;ожидание, игра, победа,&lt;br&gt;ошибка соединения" vertex="1">
+          <mxGeometry height="105" width="230" x="1170" y="980" as="geometry" />
+        </mxCell>
+        <mxCell id="model_network" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#0D9488;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;NetworkMessage&lt;/b&gt;&lt;br&gt;тип сообщения&lt;br&gt;данные хода&lt;br&gt;ошибка или отключение" vertex="1">
+          <mxGeometry height="105" width="230" x="910" y="1085" as="geometry" />
+        </mxCell>
+        <mxCell id="model_board" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#0D9488;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Состояние данных&lt;/b&gt;&lt;br&gt;координаты клетки&lt;br&gt;состояние доски&lt;br&gt;состояние партии" vertex="1">
+          <mxGeometry height="105" width="230" x="1170" y="1100" as="geometry" />
+        </mxCell>
+        <mxCell id="model_no_db" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#0D9488;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;База данных не требуется&lt;/b&gt;&lt;br&gt;для учебной сетевой партии достаточно хранения состояния в памяти приложения" vertex="1">
+          <mxGeometry height="85" width="490" x="910" y="1215" as="geometry" />
+        </mxCell>
+        <mxCell id="del_git" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#DB2777;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Git-репозиторий&lt;/b&gt;&lt;br&gt;понятная история&lt;br&gt;commit-сообщения" vertex="1">
+          <mxGeometry height="90" width="230" x="1710" y="980" as="geometry" />
+        </mxCell>
+        <mxCell id="del_docs" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#DB2777;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Документация&lt;/b&gt;&lt;br&gt;README&lt;br&gt;пользовательская инструкция&lt;br&gt;техническое задание" vertex="1">
+          <mxGeometry height="105" width="230" x="1970" y="980" as="geometry" />
+        </mxCell>
+        <mxCell id="del_installer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#DB2777;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Установщик&lt;/b&gt;&lt;br&gt;Inno Setup&lt;br&gt;exe-файл для Windows" vertex="1">
+          <mxGeometry height="90" width="230" x="1710" y="1110" as="geometry" />
+        </mxCell>
+        <mxCell id="del_package" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#DB2777;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Состав поставки&lt;/b&gt;&lt;br&gt;исходный код&lt;br&gt;документы&lt;br&gt;готовое приложение" vertex="1">
+          <mxGeometry height="110" width="230" x="1970" y="1100" as="geometry" />
+        </mxCell>
+        <mxCell id="del_support" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#DB2777;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;Сопровождение&lt;/b&gt;&lt;br&gt;исправление ошибок, история изменений, подготовка к защите учебного проекта" vertex="1">
+          <mxGeometry height="90" width="490" x="1710" y="1220" as="geometry" />
+        </mxCell>
+        <mxCell id="e_user_ui" edge="1" parent="1" source="user" style="endArrow=block;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;strokeWidth=2;strokeColor=#596579;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;spacing=6;" target="ui_container" value="действия игрока">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="230" y="205" />
+              <mxPoint x="230" y="230" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_ui_logic" edge="1" parent="1" source="ui_actions" style="endArrow=block;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;strokeWidth=2;strokeColor=#596579;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;spacing=6;" target="logic_validator" value="проверка хода">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="760" y="615" />
+              <mxPoint x="760" y="500" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_logic_ui" edge="1" parent="1" source="logic_state" style="endArrow=block;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;strokeWidth=2;strokeColor=#596579;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;spacing=6;" target="ui_container" value="обновление поля">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1160" y="745" />
+              <mxPoint x="500" y="745" />
+              <mxPoint x="500" y="670" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_ui_network" edge="1" parent="1" source="ui_connection" style="endArrow=block;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;strokeWidth=2;strokeColor=#596579;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;spacing=6;" target="network_container" value="создать сервер / подключиться">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="225" y="200" />
+              <mxPoint x="1960" y="200" />
+              <mxPoint x="1960" y="230" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_network_logic" edge="1" parent="1" source="network_container" style="endArrow=block;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;strokeWidth=2;strokeColor=#596579;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;spacing=6;" target="logic_container" value="полученный ход">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1560" y="505" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_logic_models" edge="1" parent="1" source="logic_container" style="endArrow=block;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;strokeWidth=2;strokeColor=#596579;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;spacing=6;" target="models_container" value="состояние партии">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1160" y="790" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_network_models" edge="1" parent="1" source="network_container" style="endArrow=block;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;strokeWidth=2;strokeColor=#596579;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;spacing=6;" target="models_container" value="сетевое сообщение">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1560" y="780" />
+              <mxPoint x="1560" y="1110" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_tests_logic" edge="1" parent="1" source="tests_container" style="endArrow=block;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;strokeWidth=2;strokeColor=#596579;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;spacing=6;dashed=1;dashPattern=8 4;strokeColor=#7A869A;" target="logic_container" value="тестирование логики">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="720" y="790" />
+              <mxPoint x="930" y="790" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_tests_network" edge="1" parent="1" source="tests_container" style="endArrow=block;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;strokeWidth=2;strokeColor=#596579;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;spacing=6;dashed=1;dashPattern=8 4;strokeColor=#7A869A;" target="network_container" value="интеграционные тесты Network">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="1360" />
+              <mxPoint x="2280" y="1360" />
+              <mxPoint x="2280" y="460" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_delivery_app" edge="1" parent="1" source="delivery_container" style="endArrow=block;html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;strokeWidth=2;strokeColor=#596579;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;spacing=6;dashed=1;dashPattern=8 4;strokeColor=#7A869A;" target="app" value="поставка проекта">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2300" y="1110" />
+              <mxPoint x="2300" y="150" />
+              <mxPoint x="1490" y="150" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ui_mainform" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;strokeWidth=1.5;fillColor=#ffffff;strokeColor=#2563EB;fontSize=13;align=left;verticalAlign=top;spacing=10;spacingTop=8;shadow=0;" value="&lt;b&gt;MainForm&lt;/b&gt;&lt;br&gt;главное окно WinForms&lt;br&gt;связь UI с модулями" vertex="1">
+          <mxGeometry height="90" width="230" x="110" y="310" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
