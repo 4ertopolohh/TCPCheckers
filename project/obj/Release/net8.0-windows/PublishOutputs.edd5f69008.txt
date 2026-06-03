@@ -1,0 +1,9 @@
+C:\Users\isoko\Documents\TCP checkers\publish\project.exe
+C:\Users\isoko\Documents\TCP checkers\publish\design\whiteChecker.png
+C:\Users\isoko\Documents\TCP checkers\publish\design\blackChecker.png
+C:\Users\isoko\Documents\TCP checkers\publish\design\whiteKingChecker.png
+C:\Users\isoko\Documents\TCP checkers\publish\design\blackKingChecker.png
+C:\Users\isoko\Documents\TCP checkers\publish\project.dll
+C:\Users\isoko\Documents\TCP checkers\publish\project.deps.json
+C:\Users\isoko\Documents\TCP checkers\publish\project.runtimeconfig.json
+C:\Users\isoko\Documents\TCP checkers\publish\project.pdb

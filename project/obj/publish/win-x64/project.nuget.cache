@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "WaOQg0Jfcnw=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\isoko\\Documents\\TCP checkers\\project\\project.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\isoko\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\8.0.27\\microsoft.netcore.app.runtime.win-x64.8.0.27.nupkg.sha512",
+    "C:\\Users\\isoko\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\8.0.27\\microsoft.windowsdesktop.app.runtime.win-x64.8.0.27.nupkg.sha512",
+    "C:\\Users\\isoko\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\8.0.27\\microsoft.aspnetcore.app.runtime.win-x64.8.0.27.nupkg.sha512"
+  ],
+  "logs": []
+}
