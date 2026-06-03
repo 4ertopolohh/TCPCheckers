@@ -23,6 +23,11 @@ public partial class MainForm : Form
     public MainForm()
     {
         InitializeComponent();
+        var applicationIcon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+        if (applicationIcon is not null)
+        {
+            Icon = applicationIcon;
+        }
 
         checkersGame = new CheckersGame();
         tcpServer = new TcpGameServer();
