@@ -179,18 +179,20 @@ public partial class MainForm : Form
     {
         var snapshot = checkersGame.GetBoardSnapshot();
 
-        for (var row = 0; row < 8; row++)
+        for (var screenRow = 0; screenRow < 8; screenRow++)
         {
-            for (var col = 0; col < 8; col++)
+            for (var screenCol = 0; screenCol < 8; screenCol++)
             {
-                var button = boardButtons[row, col];
-                var darkCell = (row + col) % 2 == 1;
+                var screenPosition = new CellPosition(screenRow, screenCol);
+                var boardPosition = ScreenToBoardPosition(screenPosition);
+                var button = boardButtons[screenRow, screenCol];
+                var darkCell = (boardPosition.Row + boardPosition.Col) % 2 == 1;
                 button.BackColor = darkCell ? Color.SaddleBrown : Color.Bisque;
                 button.ForeColor = Color.Black;
                 button.Text = string.Empty;
                 button.Image = null;
 
-                var piece = snapshot[row, col];
+                var piece = snapshot[boardPosition.Row, boardPosition.Col];
                 if (piece is not null)
                 {
                     var checkerImage = GetCheckerImage(piece);
@@ -205,9 +207,13 @@ public partial class MainForm : Form
                     }
                 }
 
-                if (selectedCell is not null && selectedCell.Row == row && selectedCell.Col == col)
+                if (selectedCell is not null)
                 {
-                    button.BackColor = Color.Gold;
+                    var selectedScreenCell = BoardToScreenPosition(selectedCell);
+                    if (selectedScreenCell.Row == screenRow && selectedScreenCell.Col == screenCol)
+                    {
+                        button.BackColor = Color.Gold;
+                    }
                 }
             }
         }
@@ -564,6 +570,31 @@ public partial class MainForm : Form
         return piece.Color == PlayerColor.White ? whiteCheckerImage : blackCheckerImage;
     }
 
+    private CellPosition ScreenToBoardPosition(CellPosition screenPosition)
+    {
+        if (!ShouldFlipBoard())
+        {
+            return new CellPosition(screenPosition.Row, screenPosition.Col);
+        }
+
+        return new CellPosition(7 - screenPosition.Row, 7 - screenPosition.Col);
+    }
+
+    private CellPosition BoardToScreenPosition(CellPosition boardPosition)
+    {
+        if (!ShouldFlipBoard())
+        {
+            return new CellPosition(boardPosition.Row, boardPosition.Col);
+        }
+
+        return new CellPosition(7 - boardPosition.Row, 7 - boardPosition.Col);
+    }
+
+    private bool ShouldFlipBoard()
+    {
+        return isConnected && !isServerMode && localPlayerColor == PlayerColor.Black;
+    }
+
     private int GetCheckerImageWidth()
     {
         return Math.Max(1, (int)boardPanel.ColumnStyles[0].Width - 12);
@@ -682,7 +713,7 @@ public partial class MainForm : Form
 
     private async void BoardCell_Click(object? sender, EventArgs e)
     {
-        if (sender is not Button button || button.Tag is not CellPosition position)
+        if (sender is not Button button || button.Tag is not CellPosition screenPosition)
         {
             return;
         }
@@ -698,20 +729,22 @@ public partial class MainForm : Form
             return;
         }
 
+        var boardPosition = ScreenToBoardPosition(screenPosition);
+
         if (selectedCell is null)
         {
-            SelectPiece(position);
+            SelectPiece(boardPosition);
             return;
         }
 
-        if (selectedCell.Row == position.Row && selectedCell.Col == position.Col)
+        if (selectedCell.Row == boardPosition.Row && selectedCell.Col == boardPosition.Col)
         {
             selectedCell = null;
             DrawBoard();
             return;
         }
 
-        await MakeMove(position);
+        await MakeMove(boardPosition);
     }
 
     private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
