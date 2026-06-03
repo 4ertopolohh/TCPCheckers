@@ -411,6 +411,9 @@ public partial class MainForm : Form
                 }
                 UpdateGameView();
                 break;
+            case "newGame":
+                RestartGameAfterFinish("Соперник начал новую партию.");
+                break;
             case "error":
                 ShowMessage(message.ErrorText ?? "Получена сетевая ошибка.");
                 break;
@@ -679,11 +682,18 @@ public partial class MainForm : Form
         UpdateGameView();
     }
 
-    private void newGameButton_Click(object? sender, EventArgs e)
+    private async void newGameButton_Click(object? sender, EventArgs e)
     {
         if (isConnected)
         {
-            ShowMessage("Для новой игры сначала отключитесь.");
+            if (checkersGame.GetState() is GameState.WhiteWon or GameState.BlackWon)
+            {
+                await SendNetworkMessage(NetworkMessage.CreateNewGameMessage());
+                RestartGameAfterFinish("Новая партия начата.");
+                return;
+            }
+
+            ShowMessage("Новую игру можно начать после завершения текущей партии.");
             return;
         }
 
@@ -761,6 +771,20 @@ public partial class MainForm : Form
         }
 
         ShowMessage("Подключение выполнено. Игра начинается.");
+        UpdateGameView();
+    }
+
+    private void RestartGameAfterFinish(string message)
+    {
+        selectedCell = null;
+        checkersGame.StartNewGame();
+
+        if (isConnected)
+        {
+            checkersGame.BeginConnectedGame();
+        }
+
+        ShowMessage(message);
         UpdateGameView();
     }
 

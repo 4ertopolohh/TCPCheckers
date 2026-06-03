@@ -101,6 +101,14 @@ public class NetworkMessage
         };
     }
 
+    public static NetworkMessage CreateNewGameMessage()
+    {
+        return new NetworkMessage
+        {
+            Type = "newGame"
+        };
+    }
+
     public Move? ToMove()
     {
         if (!FromRow.HasValue || !FromCol.HasValue || !ToRow.HasValue || !ToCol.HasValue)

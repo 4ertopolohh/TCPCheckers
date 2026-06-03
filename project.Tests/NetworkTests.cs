@@ -64,6 +64,15 @@ public class NetworkTests
     }
 
     [Fact]
+    public void NewGameMessageShouldSerializeAndDeserialize()
+    {
+        var restored = NetworkMessage.FromJson(NetworkMessage.CreateNewGameMessage().ToJson());
+
+        Assert.NotNull(restored);
+        Assert.Equal("newGame", restored!.Type);
+    }
+
+    [Fact]
     public async Task ServerShouldReceiveMoveOverLoopbackAsync()
     {
         using var server = new TcpGameServer();
