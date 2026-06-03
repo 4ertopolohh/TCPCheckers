@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using project.GameLogic;
 using project.Models;
 using project.Network;
@@ -11,6 +11,10 @@ public partial class MainForm : Form
     private readonly TcpGameServer tcpServer;
     private readonly TcpGameClient tcpClient;
     private readonly Button[,] boardButtons;
+    private Image? whiteCheckerImage;
+    private Image? blackCheckerImage;
+    private Image? whiteKingCheckerImage;
+    private Image? blackKingCheckerImage;
     private CellPosition? selectedCell;
     private bool isServerMode;
     private PlayerColor localPlayerColor;
@@ -32,6 +36,7 @@ public partial class MainForm : Form
         gameFinished = false;
 
         InitializeBoardButtons();
+        LoadCheckerImages();
         BindEvents();
         SetDefaultValues();
         checkersGame.StartNewGame();
@@ -79,10 +84,13 @@ public partial class MainForm : Form
                     Margin = Padding.Empty,
                     FlatStyle = FlatStyle.Flat,
                     Font = new Font(FontFamily.GenericSansSerif, 10F, FontStyle.Bold),
+                    ImageAlign = ContentAlignment.MiddleCenter,
                     Tag = new CellPosition(row, col),
+                    TextImageRelation = TextImageRelation.Overlay,
                     TabStop = false
                 };
 
+                button.FlatAppearance.BorderSize = 0;
                 button.Click += BoardCell_Click;
                 boardButtons[row, col] = button;
                 boardPanel.Controls.Add(button, col, row);
@@ -180,12 +188,21 @@ public partial class MainForm : Form
                 button.BackColor = darkCell ? Color.SaddleBrown : Color.Bisque;
                 button.ForeColor = Color.Black;
                 button.Text = string.Empty;
+                button.Image = null;
 
                 var piece = snapshot[row, col];
                 if (piece is not null)
                 {
-                    button.Text = GetPieceText(piece);
-                    button.ForeColor = piece.Color == PlayerColor.White ? Color.White : Color.Black;
+                    var checkerImage = GetCheckerImage(piece);
+                    if (checkerImage is not null)
+                    {
+                        button.Image = checkerImage;
+                    }
+                    else
+                    {
+                        button.Text = GetPieceFallbackText(piece);
+                        button.ForeColor = piece.Color == PlayerColor.White ? Color.White : Color.Black;
+                    }
                 }
 
                 if (selectedCell is not null && selectedCell.Row == row && selectedCell.Col == col)
@@ -499,7 +516,89 @@ public partial class MainForm : Form
         }
     }
 
-    private static string GetPieceText(Piece piece)
+    private void LoadCheckerImages()
+    {
+        var whiteImagePath = Path.Combine(AppContext.BaseDirectory, "design", "whiteChecker.png");
+        var blackImagePath = Path.Combine(AppContext.BaseDirectory, "design", "blackChecker.png");
+        var whiteKingImagePath = Path.Combine(AppContext.BaseDirectory, "design", "whiteKingChecker.png");
+        var blackKingImagePath = Path.Combine(AppContext.BaseDirectory, "design", "blackKingChecker.png");
+
+        try
+        {
+            if (!File.Exists(whiteImagePath) ||
+                !File.Exists(blackImagePath) ||
+                !File.Exists(whiteKingImagePath) ||
+                !File.Exists(blackKingImagePath))
+            {
+                ShowMessage("Не удалось загрузить изображения шашек. Будет использовано текстовое отображение.");
+                return;
+            }
+
+            using var whiteSource = Image.FromFile(whiteImagePath);
+            using var blackSource = Image.FromFile(blackImagePath);
+            using var whiteKingSource = Image.FromFile(whiteKingImagePath);
+            using var blackKingSource = Image.FromFile(blackKingImagePath);
+
+            var targetWidth = GetCheckerImageWidth();
+            var targetHeight = GetCheckerImageHeight();
+
+            whiteCheckerImage = ResizeCheckerImage(whiteSource, targetWidth, targetHeight);
+            blackCheckerImage = ResizeCheckerImage(blackSource, targetWidth, targetHeight);
+            whiteKingCheckerImage = ResizeCheckerImage(whiteKingSource, targetWidth, targetHeight);
+            blackKingCheckerImage = ResizeCheckerImage(blackKingSource, targetWidth, targetHeight);
+        }
+        catch
+        {
+            DisposeCheckerImages();
+            ShowMessage("Не удалось загрузить изображения шашек. Будет использовано текстовое отображение.");
+        }
+    }
+
+    private Image? GetCheckerImage(Piece piece)
+    {
+        if (piece.Type == PieceType.King)
+        {
+            return piece.Color == PlayerColor.White ? whiteKingCheckerImage : blackKingCheckerImage;
+        }
+
+        return piece.Color == PlayerColor.White ? whiteCheckerImage : blackCheckerImage;
+    }
+
+    private int GetCheckerImageWidth()
+    {
+        return Math.Max(1, (int)boardPanel.ColumnStyles[0].Width - 12);
+    }
+
+    private int GetCheckerImageHeight()
+    {
+        return Math.Max(1, (int)boardPanel.RowStyles[0].Height - 12);
+    }
+
+    private static Image ResizeCheckerImage(Image source, int width, int height)
+    {
+        var resizedImage = new Bitmap(width, height);
+        using var graphics = Graphics.FromImage(resizedImage);
+        graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+        graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+        graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+        graphics.Clear(Color.Transparent);
+        graphics.DrawImage(source, 0, 0, width, height);
+        return resizedImage;
+    }
+
+    private void DisposeCheckerImages()
+    {
+        whiteCheckerImage?.Dispose();
+        blackCheckerImage?.Dispose();
+        whiteKingCheckerImage?.Dispose();
+        blackKingCheckerImage?.Dispose();
+        whiteCheckerImage = null;
+        blackCheckerImage = null;
+        whiteKingCheckerImage = null;
+        blackKingCheckerImage = null;
+    }
+
+    private static string GetPieceFallbackText(Piece piece)
     {
         if (piece.Color == PlayerColor.White)
         {
@@ -618,6 +717,7 @@ public partial class MainForm : Form
     private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
     {
         SafeStopNetwork();
+        DisposeCheckerImages();
     }
 
     private void SafeStopNetwork()
@@ -639,5 +739,3 @@ public partial class MainForm : Form
         }
     }
 }
-
-
