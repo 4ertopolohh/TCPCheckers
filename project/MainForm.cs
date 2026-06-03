@@ -1,0 +1,643 @@
+﻿using System.Net;
+using project.GameLogic;
+using project.Models;
+using project.Network;
+
+namespace project;
+
+public partial class MainForm : Form
+{
+    private readonly CheckersGame checkersGame;
+    private readonly TcpGameServer tcpServer;
+    private readonly TcpGameClient tcpClient;
+    private readonly Button[,] boardButtons;
+    private CellPosition? selectedCell;
+    private bool isServerMode;
+    private PlayerColor localPlayerColor;
+    private bool isConnected;
+    private bool gameFinished;
+
+    public MainForm()
+    {
+        InitializeComponent();
+
+        checkersGame = new CheckersGame();
+        tcpServer = new TcpGameServer();
+        tcpClient = new TcpGameClient();
+        boardButtons = new Button[8, 8];
+
+        localPlayerColor = PlayerColor.White;
+        isConnected = false;
+        isServerMode = false;
+        gameFinished = false;
+
+        InitializeBoardButtons();
+        BindEvents();
+        SetDefaultValues();
+        checkersGame.StartNewGame();
+
+        ShowMessage("Выберите режим: создать сервер или подключиться к игре.");
+        UpdateGameView();
+    }
+
+    private void BindEvents()
+    {
+        checkersGame.BoardChanged += OnBoardChanged;
+        checkersGame.GameStateChanged += OnGameStateChanged;
+
+        tcpServer.ClientConnected += OnServerClientConnected;
+        tcpServer.MessageReceived += OnMessageReceived;
+        tcpServer.ConnectionLost += HandleConnectionLost;
+
+        tcpClient.Connected += OnClientConnected;
+        tcpClient.MessageReceived += OnMessageReceived;
+        tcpClient.ConnectionLost += HandleConnectionLost;
+
+        FormClosing += MainForm_FormClosing;
+    }
+
+    private void SetDefaultValues()
+    {
+        ipAddressTextBox.Text = "127.0.0.1";
+        portTextBox.Text = "5000";
+        connectionStatusLabel.Text = "Состояние: не подключено";
+        localPlayerLabel.Text = "Ваш цвет: не назначен";
+        gameStateLabel.Text = "Состояние игры: ожидание";
+    }
+
+    private void InitializeBoardButtons()
+    {
+        boardPanel.Controls.Clear();
+
+        for (var row = 0; row < 8; row++)
+        {
+            for (var col = 0; col < 8; col++)
+            {
+                var button = new Button
+                {
+                    Dock = DockStyle.Fill,
+                    Margin = Padding.Empty,
+                    FlatStyle = FlatStyle.Flat,
+                    Font = new Font(FontFamily.GenericSansSerif, 10F, FontStyle.Bold),
+                    Tag = new CellPosition(row, col),
+                    TabStop = false
+                };
+
+                button.Click += BoardCell_Click;
+                boardButtons[row, col] = button;
+                boardPanel.Controls.Add(button, col, row);
+            }
+        }
+    }
+
+    public void StartServer()
+    {
+        if (!TryParsePort(out var port))
+        {
+            ShowMessage("Некорректный порт.");
+            return;
+        }
+
+        try
+        {
+            isServerMode = true;
+            localPlayerColor = PlayerColor.White;
+            isConnected = false;
+            gameFinished = false;
+            selectedCell = null;
+
+            checkersGame.StartNewGame();
+            tcpServer.Start(port);
+
+            startServerButton.Enabled = false;
+            connectButton.Enabled = false;
+            disconnectButton.Enabled = true;
+            connectionStatusLabel.Text = "Состояние: сервер запущен";
+            localPlayerLabel.Text = "Ваш цвет: Белые";
+            gameStateLabel.Text = "Состояние игры: ожидание подключения";
+
+            ShowMessage("Сервер запущен. Ожидание второго игрока.");
+            UpdateGameView();
+        }
+        catch
+        {
+            ShowMessage("Не удалось запустить сервер.");
+        }
+    }
+
+    public async Task ConnectToServer()
+    {
+        if (!IPAddress.TryParse(ipAddressTextBox.Text.Trim(), out _))
+        {
+            ShowMessage("Некорректный IP-адрес.");
+            return;
+        }
+
+        if (!TryParsePort(out var port))
+        {
+            ShowMessage("Некорректный порт.");
+            return;
+        }
+
+        try
+        {
+            isServerMode = false;
+            localPlayerColor = PlayerColor.Black;
+            selectedCell = null;
+            gameFinished = false;
+            checkersGame.StartNewGame();
+
+            await tcpClient.Connect(ipAddressTextBox.Text.Trim(), port);
+            isConnected = true;
+
+            startServerButton.Enabled = false;
+            connectButton.Enabled = false;
+            disconnectButton.Enabled = true;
+            connectionStatusLabel.Text = "Состояние: подключено";
+            localPlayerLabel.Text = "Ваш цвет: Черные";
+            gameStateLabel.Text = "Состояние игры: идет партия";
+
+            await tcpClient.SendMessage(NetworkMessage.CreateConnectMessage(localPlayerColor));
+            ShowMessage("Подключение выполнено. Игра начинается.");
+            UpdateGameView();
+        }
+        catch
+        {
+            ShowMessage("Не удалось подключиться к серверу.");
+        }
+    }
+
+    public void DrawBoard()
+    {
+        var snapshot = checkersGame.GetBoardSnapshot();
+
+        for (var row = 0; row < 8; row++)
+        {
+            for (var col = 0; col < 8; col++)
+            {
+                var button = boardButtons[row, col];
+                var darkCell = (row + col) % 2 == 1;
+                button.BackColor = darkCell ? Color.SaddleBrown : Color.Bisque;
+                button.ForeColor = Color.Black;
+                button.Text = string.Empty;
+
+                var piece = snapshot[row, col];
+                if (piece is not null)
+                {
+                    button.Text = GetPieceText(piece);
+                    button.ForeColor = piece.Color == PlayerColor.White ? Color.White : Color.Black;
+                }
+
+                if (selectedCell is not null && selectedCell.Row == row && selectedCell.Col == col)
+                {
+                    button.BackColor = Color.Gold;
+                }
+            }
+        }
+    }
+
+    public void SelectPiece(CellPosition position)
+    {
+        if (!position.IsValid())
+        {
+            return;
+        }
+
+        var piece = checkersGame.GetBoardSnapshot()[position.Row, position.Col];
+        if (piece is null)
+        {
+            ShowMessage("Выберите шашку для хода.");
+            return;
+        }
+
+        if (piece.Color != localPlayerColor)
+        {
+            ShowMessage("Нельзя ходить чужой шашкой.");
+            return;
+        }
+
+        if (checkersGame.GetCurrentPlayer() != localPlayerColor)
+        {
+            ShowMessage("Ожидание хода соперника.");
+            return;
+        }
+
+        selectedCell = position;
+        DrawBoard();
+    }
+
+    public async Task MakeMove(CellPosition target)
+    {
+        if (selectedCell is null)
+        {
+            return;
+        }
+
+        var move = new Move(selectedCell.Row, selectedCell.Col, target.Row, target.Col);
+        var result = checkersGame.TryMakeMove(move);
+
+        if (!result.Success)
+        {
+            selectedCell = null;
+            ShowMessage(result.Message);
+            DrawBoard();
+            UpdateGameView();
+            return;
+        }
+
+        if (result.RequiresAdditionalCapture)
+        {
+            selectedCell = new CellPosition(target.Row, target.Col);
+            ShowMessage("Продолжите взятие той же шашкой.");
+        }
+        else
+        {
+            selectedCell = null;
+            ShowMessage("Ход выполнен.");
+        }
+
+        await SendNetworkMessage(NetworkMessage.CreateMoveMessage(move));
+
+        if (result.Winner.HasValue)
+        {
+            gameFinished = true;
+            await SendNetworkMessage(NetworkMessage.CreateGameOverMessage(result.Winner.Value));
+            ShowMessage($"Партия завершена. Победитель: {GetColorText(result.Winner.Value)}.");
+        }
+
+        DrawBoard();
+        UpdateGameView();
+    }
+
+    public void ShowMessage(string message)
+    {
+        if (InvokeRequired)
+        {
+            BeginInvoke(new Action(() => ShowMessage(message)));
+            return;
+        }
+
+        messagesListBox.Items.Add($"{DateTime.Now:HH:mm:ss} {message}");
+        messagesListBox.TopIndex = messagesListBox.Items.Count - 1;
+    }
+
+    public void UpdateGameView()
+    {
+        if (InvokeRequired)
+        {
+            BeginInvoke(new Action(UpdateGameView));
+            return;
+        }
+
+        DrawBoard();
+
+        var currentPlayer = checkersGame.GetCurrentPlayer();
+        currentPlayerLabel.Text = $"Текущий игрок: {GetColorText(currentPlayer)}";
+        localPlayerLabel.Text = isConnected || isServerMode
+            ? $"Ваш цвет: {GetColorText(localPlayerColor)}"
+            : "Ваш цвет: не назначен";
+
+        if (!isConnected)
+        {
+            if (isServerMode)
+            {
+                connectionStatusLabel.Text = "Состояние: ожидание подключения";
+            }
+            else
+            {
+                connectionStatusLabel.Text = "Состояние: не подключено";
+            }
+        }
+        else
+        {
+            connectionStatusLabel.Text = "Состояние: подключено";
+        }
+
+        var gameState = checkersGame.GetState();
+        gameStateLabel.Text = $"Состояние игры: {GetGameStateText(gameState)}";
+
+        var canMove = isConnected && !gameFinished && gameState == GameState.Playing && currentPlayer == localPlayerColor;
+        boardPanel.Enabled = canMove;
+
+        if (isConnected && gameState == GameState.Playing)
+        {
+            ShowTurnMessage(canMove);
+        }
+    }
+
+    public void HandleConnectionLost()
+    {
+        if (InvokeRequired)
+        {
+            BeginInvoke(new Action(HandleConnectionLost));
+            return;
+        }
+
+        isConnected = false;
+        gameFinished = true;
+        selectedCell = null;
+        checkersGame.SetConnectionError();
+
+        SafeStopNetwork();
+        startServerButton.Enabled = true;
+        connectButton.Enabled = true;
+        disconnectButton.Enabled = false;
+        boardPanel.Enabled = false;
+
+        ShowMessage("Соединение со вторым игроком потеряно.");
+        UpdateGameView();
+    }
+
+    private async Task SendNetworkMessage(NetworkMessage message)
+    {
+        if (!isConnected)
+        {
+            return;
+        }
+
+        try
+        {
+            if (isServerMode)
+            {
+                await tcpServer.SendMessage(message);
+            }
+            else
+            {
+                await tcpClient.SendMessage(message);
+            }
+        }
+        catch
+        {
+            HandleConnectionLost();
+        }
+    }
+
+    private void OnMessageReceived(NetworkMessage message)
+    {
+        if (InvokeRequired)
+        {
+            BeginInvoke(new Action(() => OnMessageReceived(message)));
+            return;
+        }
+
+        switch (message.Type)
+        {
+            case "connect":
+                ShowMessage("Подключение выполнено. Игра начинается.");
+                break;
+            case "move":
+                ApplyRemoteMove(message);
+                break;
+            case "gameOver":
+                gameFinished = true;
+                if (message.Winner.HasValue)
+                {
+                    ShowMessage($"Партия завершена. Победитель: {GetColorText(message.Winner.Value)}.");
+                }
+                UpdateGameView();
+                break;
+            case "error":
+                ShowMessage(message.ErrorText ?? "Получена сетевая ошибка.");
+                break;
+            case "disconnect":
+                HandleConnectionLost();
+                break;
+            default:
+                ShowMessage("Получено неизвестное сетевое сообщение.");
+                break;
+        }
+    }
+
+    private void ApplyRemoteMove(NetworkMessage message)
+    {
+        if (message.Move is null)
+        {
+            ShowMessage("Получено неизвестное сетевое сообщение.");
+            return;
+        }
+
+        var result = checkersGame.TryMakeMove(message.Move);
+        if (!result.Success)
+        {
+            ShowMessage("Получен некорректный ход соперника.");
+            return;
+        }
+
+        selectedCell = null;
+
+        if (result.Winner.HasValue)
+        {
+            gameFinished = true;
+            ShowMessage($"Партия завершена. Победитель: {GetColorText(result.Winner.Value)}.");
+        }
+
+        UpdateGameView();
+    }
+
+    private void OnServerClientConnected()
+    {
+        if (InvokeRequired)
+        {
+            BeginInvoke(new Action(OnServerClientConnected));
+            return;
+        }
+
+        isConnected = true;
+        gameFinished = false;
+        localPlayerColor = PlayerColor.White;
+        connectionStatusLabel.Text = "Состояние: подключено";
+        localPlayerLabel.Text = "Ваш цвет: Белые";
+        ShowMessage("Подключение выполнено. Игра начинается.");
+        _ = SendNetworkMessage(NetworkMessage.CreateConnectMessage(PlayerColor.Black));
+        UpdateGameView();
+    }
+
+    private void OnClientConnected()
+    {
+        if (InvokeRequired)
+        {
+            BeginInvoke(new Action(OnClientConnected));
+            return;
+        }
+
+        isConnected = true;
+        gameFinished = false;
+        localPlayerColor = PlayerColor.Black;
+        connectionStatusLabel.Text = "Состояние: подключено";
+        localPlayerLabel.Text = "Ваш цвет: Черные";
+        UpdateGameView();
+    }
+
+    private void OnBoardChanged()
+    {
+        UpdateGameView();
+    }
+
+    private void OnGameStateChanged(GameState state)
+    {
+        if (state is GameState.WhiteWon or GameState.BlackWon)
+        {
+            gameFinished = true;
+        }
+
+        UpdateGameView();
+    }
+
+    private void ShowTurnMessage(bool canMove)
+    {
+        var expected = canMove ? "Ваш ход." : "Ожидание хода соперника.";
+        if (messagesListBox.Items.Count == 0)
+        {
+            ShowMessage(expected);
+            return;
+        }
+
+        var last = messagesListBox.Items[messagesListBox.Items.Count - 1]?.ToString() ?? string.Empty;
+        if (!last.Contains(expected, StringComparison.Ordinal))
+        {
+            ShowMessage(expected);
+        }
+    }
+
+    private static string GetPieceText(Piece piece)
+    {
+        if (piece.Color == PlayerColor.White)
+        {
+            return piece.Type == PieceType.King ? "WK" : "W";
+        }
+
+        return piece.Type == PieceType.King ? "BK" : "B";
+    }
+
+    private static string GetColorText(PlayerColor color)
+    {
+        return color == PlayerColor.White ? "Белые" : "Черные";
+    }
+
+    private static string GetGameStateText(GameState state)
+    {
+        return state switch
+        {
+            GameState.WaitingForConnection => "ожидание подключения",
+            GameState.Playing => "идет партия",
+            GameState.WhiteWon => "победа белых",
+            GameState.BlackWon => "победа черных",
+            GameState.ConnectionError => "ошибка соединения",
+            GameState.GameOver => "игра завершена",
+            _ => "неизвестно"
+        };
+    }
+
+    private bool TryParsePort(out int port)
+    {
+        port = 0;
+        return int.TryParse(portTextBox.Text.Trim(), out port) && port > 0 && port <= 65535;
+    }
+
+    private async void startServerButton_Click(object? sender, EventArgs e)
+    {
+        StartServer();
+        await Task.CompletedTask;
+    }
+
+    private async void connectButton_Click(object? sender, EventArgs e)
+    {
+        await ConnectToServer();
+    }
+
+    private async void disconnectButton_Click(object? sender, EventArgs e)
+    {
+        if (isConnected)
+        {
+            await SendNetworkMessage(NetworkMessage.CreateDisconnectMessage("Игрок отключился."));
+        }
+
+        SafeStopNetwork();
+        isConnected = false;
+        isServerMode = false;
+        gameFinished = true;
+        selectedCell = null;
+
+        startServerButton.Enabled = true;
+        connectButton.Enabled = true;
+        disconnectButton.Enabled = false;
+
+        ShowMessage("Соединение завершено.");
+        UpdateGameView();
+    }
+
+    private void newGameButton_Click(object? sender, EventArgs e)
+    {
+        if (isConnected)
+        {
+            ShowMessage("Для новой игры сначала отключитесь.");
+            return;
+        }
+
+        selectedCell = null;
+        gameFinished = false;
+        checkersGame.StartNewGame();
+        ShowMessage("Новая игра подготовлена.");
+        UpdateGameView();
+    }
+
+    private async void BoardCell_Click(object? sender, EventArgs e)
+    {
+        if (sender is not Button button || button.Tag is not CellPosition position)
+        {
+            return;
+        }
+
+        if (!isConnected || gameFinished)
+        {
+            return;
+        }
+
+        if (checkersGame.GetCurrentPlayer() != localPlayerColor)
+        {
+            ShowMessage("Ожидание хода соперника.");
+            return;
+        }
+
+        if (selectedCell is null)
+        {
+            SelectPiece(position);
+            return;
+        }
+
+        if (selectedCell.Row == position.Row && selectedCell.Col == position.Col)
+        {
+            selectedCell = null;
+            DrawBoard();
+            return;
+        }
+
+        await MakeMove(position);
+    }
+
+    private void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
+    {
+        SafeStopNetwork();
+    }
+
+    private void SafeStopNetwork()
+    {
+        try
+        {
+            tcpServer.Stop();
+        }
+        catch
+        {
+        }
+
+        try
+        {
+            tcpClient.Disconnect();
+        }
+        catch
+        {
+        }
+    }
+}
+
+

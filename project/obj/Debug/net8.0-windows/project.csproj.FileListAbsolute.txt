@@ -1,0 +1,17 @@
+C:\Users\isoko\Documents\TCP checkers\project\bin\Debug\net8.0-windows\project.exe
+C:\Users\isoko\Documents\TCP checkers\project\bin\Debug\net8.0-windows\project.deps.json
+C:\Users\isoko\Documents\TCP checkers\project\bin\Debug\net8.0-windows\project.runtimeconfig.json
+C:\Users\isoko\Documents\TCP checkers\project\bin\Debug\net8.0-windows\project.dll
+C:\Users\isoko\Documents\TCP checkers\project\bin\Debug\net8.0-windows\project.pdb
+C:\Users\isoko\Documents\TCP checkers\project\obj\Debug\net8.0-windows\project.MainForm.resources
+C:\Users\isoko\Documents\TCP checkers\project\obj\Debug\net8.0-windows\project.csproj.GenerateResource.cache
+C:\Users\isoko\Documents\TCP checkers\project\obj\Debug\net8.0-windows\project.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\isoko\Documents\TCP checkers\project\obj\Debug\net8.0-windows\project.AssemblyInfoInputs.cache
+C:\Users\isoko\Documents\TCP checkers\project\obj\Debug\net8.0-windows\project.AssemblyInfo.cs
+C:\Users\isoko\Documents\TCP checkers\project\obj\Debug\net8.0-windows\project.csproj.CoreCompileInputs.cache
+C:\Users\isoko\Documents\TCP checkers\project\obj\Debug\net8.0-windows\project.sourcelink.json
+C:\Users\isoko\Documents\TCP checkers\project\obj\Debug\net8.0-windows\project.dll
+C:\Users\isoko\Documents\TCP checkers\project\obj\Debug\net8.0-windows\refint\project.dll
+C:\Users\isoko\Documents\TCP checkers\project\obj\Debug\net8.0-windows\project.pdb
+C:\Users\isoko\Documents\TCP checkers\project\obj\Debug\net8.0-windows\project.genruntimeconfig.cache
+C:\Users\isoko\Documents\TCP checkers\project\obj\Debug\net8.0-windows\ref\project.dll
