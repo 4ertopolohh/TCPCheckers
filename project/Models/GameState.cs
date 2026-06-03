@@ -6,7 +6,6 @@ public enum GameState
     Playing,
     WhiteWon,
     BlackWon,
-    ConnectionError,
-    GameOver
+    ConnectionError
 }
 

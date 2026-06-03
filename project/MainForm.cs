@@ -19,7 +19,6 @@ public partial class MainForm : Form
     private bool isServerMode;
     private PlayerColor localPlayerColor;
     private bool isConnected;
-    private bool gameFinished;
 
     public MainForm()
     {
@@ -33,7 +32,6 @@ public partial class MainForm : Form
         localPlayerColor = PlayerColor.White;
         isConnected = false;
         isServerMode = false;
-        gameFinished = false;
 
         InitializeBoardButtons();
         LoadCheckerImages();
@@ -111,7 +109,6 @@ public partial class MainForm : Form
             isServerMode = true;
             localPlayerColor = PlayerColor.White;
             isConnected = false;
-            gameFinished = false;
             selectedCell = null;
 
             checkersGame.StartNewGame();
@@ -152,21 +149,19 @@ public partial class MainForm : Form
             isServerMode = false;
             localPlayerColor = PlayerColor.Black;
             selectedCell = null;
-            gameFinished = false;
             checkersGame.StartNewGame();
 
             await tcpClient.Connect(ipAddressTextBox.Text.Trim(), port);
-            isConnected = true;
 
             startServerButton.Enabled = false;
             connectButton.Enabled = false;
             disconnectButton.Enabled = true;
             connectionStatusLabel.Text = "Состояние: подключено";
             localPlayerLabel.Text = "Ваш цвет: Черные";
-            gameStateLabel.Text = "Состояние игры: идет партия";
+            gameStateLabel.Text = "Состояние игры: ожидание подключения";
 
             await tcpClient.SendMessage(NetworkMessage.CreateConnectMessage(localPlayerColor));
-            ShowMessage("Подключение выполнено. Игра начинается.");
+            ShowMessage("Подключение выполнено. Ожидание подтверждения игры.");
             UpdateGameView();
         }
         catch
@@ -283,7 +278,6 @@ public partial class MainForm : Form
 
         if (result.Winner.HasValue)
         {
-            gameFinished = true;
             await SendNetworkMessage(NetworkMessage.CreateGameOverMessage(result.Winner.Value));
             ShowMessage($"Партия завершена. Победитель: {GetColorText(result.Winner.Value)}.");
         }
@@ -339,7 +333,7 @@ public partial class MainForm : Form
         var gameState = checkersGame.GetState();
         gameStateLabel.Text = $"Состояние игры: {GetGameStateText(gameState)}";
 
-        var canMove = isConnected && !gameFinished && gameState == GameState.Playing && currentPlayer == localPlayerColor;
+        var canMove = isConnected && gameState == GameState.Playing && currentPlayer == localPlayerColor;
         boardPanel.Enabled = canMove;
 
         if (isConnected && gameState == GameState.Playing)
@@ -357,7 +351,6 @@ public partial class MainForm : Form
         }
 
         isConnected = false;
-        gameFinished = true;
         selectedCell = null;
         checkersGame.SetConnectionError();
 
@@ -406,13 +399,12 @@ public partial class MainForm : Form
         switch (message.Type)
         {
             case "connect":
-                ShowMessage("Подключение выполнено. Игра начинается.");
+                HandleConnectMessage(message);
                 break;
             case "move":
                 ApplyRemoteMove(message);
                 break;
             case "gameOver":
-                gameFinished = true;
                 if (message.Winner.HasValue)
                 {
                     ShowMessage($"Партия завершена. Победитель: {GetColorText(message.Winner.Value)}.");
@@ -433,13 +425,14 @@ public partial class MainForm : Form
 
     private void ApplyRemoteMove(NetworkMessage message)
     {
-        if (message.Move is null)
+        var move = message.ToMove();
+        if (move is null)
         {
             ShowMessage("Получено неизвестное сетевое сообщение.");
             return;
         }
 
-        var result = checkersGame.TryMakeMove(message.Move);
+        var result = checkersGame.TryMakeMove(move);
         if (!result.Success)
         {
             ShowMessage("Получен некорректный ход соперника.");
@@ -450,7 +443,6 @@ public partial class MainForm : Form
 
         if (result.Winner.HasValue)
         {
-            gameFinished = true;
             ShowMessage($"Партия завершена. Победитель: {GetColorText(result.Winner.Value)}.");
         }
 
@@ -466,12 +458,10 @@ public partial class MainForm : Form
         }
 
         isConnected = true;
-        gameFinished = false;
         localPlayerColor = PlayerColor.White;
         connectionStatusLabel.Text = "Состояние: подключено";
         localPlayerLabel.Text = "Ваш цвет: Белые";
-        ShowMessage("Подключение выполнено. Игра начинается.");
-        _ = SendNetworkMessage(NetworkMessage.CreateConnectMessage(PlayerColor.Black));
+        ShowMessage("TCP-подключение установлено. Ожидание сообщения connect.");
         UpdateGameView();
     }
 
@@ -484,7 +474,6 @@ public partial class MainForm : Form
         }
 
         isConnected = true;
-        gameFinished = false;
         localPlayerColor = PlayerColor.Black;
         connectionStatusLabel.Text = "Состояние: подключено";
         localPlayerLabel.Text = "Ваш цвет: Черные";
@@ -498,11 +487,6 @@ public partial class MainForm : Form
 
     private void OnGameStateChanged(GameState state)
     {
-        if (state is GameState.WhiteWon or GameState.BlackWon)
-        {
-            gameFinished = true;
-        }
-
         UpdateGameView();
     }
 
@@ -653,7 +637,6 @@ public partial class MainForm : Form
             GameState.WhiteWon => "победа белых",
             GameState.BlackWon => "победа черных",
             GameState.ConnectionError => "ошибка соединения",
-            GameState.GameOver => "игра завершена",
             _ => "неизвестно"
         };
     }
@@ -685,8 +668,8 @@ public partial class MainForm : Form
         SafeStopNetwork();
         isConnected = false;
         isServerMode = false;
-        gameFinished = true;
         selectedCell = null;
+        checkersGame.SetConnectionError();
 
         startServerButton.Enabled = true;
         connectButton.Enabled = true;
@@ -705,7 +688,6 @@ public partial class MainForm : Form
         }
 
         selectedCell = null;
-        gameFinished = false;
         checkersGame.StartNewGame();
         ShowMessage("Новая игра подготовлена.");
         UpdateGameView();
@@ -718,7 +700,7 @@ public partial class MainForm : Form
             return;
         }
 
-        if (!isConnected || gameFinished)
+        if (!isConnected || checkersGame.GetState() != GameState.Playing)
         {
             return;
         }
@@ -751,6 +733,35 @@ public partial class MainForm : Form
     {
         SafeStopNetwork();
         DisposeCheckerImages();
+    }
+
+    private void HandleConnectMessage(NetworkMessage message)
+    {
+        if (!message.PlayerColor.HasValue)
+        {
+            ShowMessage("Получено некорректное сообщение connect.");
+            return;
+        }
+
+        if (checkersGame.GetState() != GameState.WaitingForConnection)
+        {
+            return;
+        }
+
+        if (isServerMode)
+        {
+            localPlayerColor = PlayerColor.White;
+            checkersGame.BeginConnectedGame();
+            _ = SendNetworkMessage(NetworkMessage.CreateConnectMessage(localPlayerColor));
+        }
+        else
+        {
+            localPlayerColor = PlayerColor.Black;
+            checkersGame.BeginConnectedGame();
+        }
+
+        ShowMessage("Подключение выполнено. Игра начинается.");
+        UpdateGameView();
     }
 
     private void SafeStopNetwork()

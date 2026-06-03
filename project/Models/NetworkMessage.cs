@@ -14,8 +14,17 @@ public class NetworkMessage
     [JsonPropertyName("type")]
     public string Type { get; set; } = string.Empty;
 
-    [JsonPropertyName("move")]
-    public Move? Move { get; set; }
+    [JsonPropertyName("fromRow")]
+    public int? FromRow { get; set; }
+
+    [JsonPropertyName("fromCol")]
+    public int? FromCol { get; set; }
+
+    [JsonPropertyName("toRow")]
+    public int? ToRow { get; set; }
+
+    [JsonPropertyName("toCol")]
+    public int? ToCol { get; set; }
 
     [JsonPropertyName("winner")]
     public PlayerColor? Winner { get; set; }
@@ -25,6 +34,9 @@ public class NetworkMessage
 
     [JsonPropertyName("playerColor")]
     public PlayerColor? PlayerColor { get; set; }
+
+    [JsonPropertyName("reason")]
+    public string? Reason { get; set; }
 
     public string ToJson()
     {
@@ -46,7 +58,10 @@ public class NetworkMessage
         return new NetworkMessage
         {
             Type = "move",
-            Move = move
+            FromRow = move.FromRow,
+            FromCol = move.FromCol,
+            ToRow = move.ToRow,
+            ToCol = move.ToCol
         };
     }
 
@@ -82,8 +97,18 @@ public class NetworkMessage
         return new NetworkMessage
         {
             Type = "disconnect",
-            ErrorText = reason
+            Reason = reason
         };
+    }
+
+    public Move? ToMove()
+    {
+        if (!FromRow.HasValue || !FromCol.HasValue || !ToRow.HasValue || !ToCol.HasValue)
+        {
+            return null;
+        }
+
+        return new Move(FromRow.Value, FromCol.Value, ToRow.Value, ToCol.Value);
     }
 }
 

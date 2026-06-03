@@ -15,17 +15,34 @@ public class CheckersGame
     public event Action<GameState>? GameStateChanged;
 
     public CheckersGame()
+        : this(new GameBoard(), PlayerColor.White, GameState.WaitingForConnection, null)
     {
-        board = new GameBoard();
-        validator = new MoveValidator(board);
-        currentPlayer = PlayerColor.White;
-        state = GameState.WaitingForConnection;
         StartNewGame();
+    }
+
+    internal CheckersGame(GameBoard board, PlayerColor currentPlayer, GameState state, CellPosition? requiredCaptureFrom)
+    {
+        this.board = board;
+        validator = new MoveValidator(this.board);
+        this.currentPlayer = currentPlayer;
+        this.state = state;
+        this.requiredCaptureFrom = requiredCaptureFrom is null
+            ? null
+            : new CellPosition(requiredCaptureFrom.Row, requiredCaptureFrom.Col);
     }
 
     public void StartNewGame()
     {
         board.Initialize();
+        currentPlayer = PlayerColor.White;
+        requiredCaptureFrom = null;
+        state = GameState.WaitingForConnection;
+        BoardChanged?.Invoke();
+        GameStateChanged?.Invoke(state);
+    }
+
+    public void BeginConnectedGame()
+    {
         currentPlayer = PlayerColor.White;
         requiredCaptureFrom = null;
         state = GameState.Playing;
